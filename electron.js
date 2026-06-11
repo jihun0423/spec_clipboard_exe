@@ -16,12 +16,12 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, "preload.js"),
+      partition: "persist:main",
     },
     title: "스펙 복사기",
     autoHideMenuBar: true,
   });
 
-  // Google 로그인 팝업 허용
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.includes("accounts.google.com") || url.includes("firebaseapp.com")) {
       return {
@@ -30,6 +30,9 @@ function createWindow() {
           width: 500,
           height: 650,
           alwaysOnTop: true,
+          webPreferences: {
+            partition: "persist:main",
+          },
         },
       };
     }
