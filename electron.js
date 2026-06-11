@@ -21,6 +21,21 @@ function createWindow() {
     autoHideMenuBar: true,
   });
 
+  // Google 로그인 팝업 허용
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.includes("accounts.google.com") || url.includes("firebaseapp.com")) {
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          width: 500,
+          height: 650,
+          alwaysOnTop: true,
+        },
+      };
+    }
+    return { action: "deny" };
+  });
+
   if (isDev) {
     win.loadURL("http://localhost:5173");
   } else {
