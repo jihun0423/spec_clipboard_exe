@@ -11,26 +11,21 @@
 
 ## 📸 미리보기
 
-> 채용 사이트 옆에 나란히 띄워두고 사용! 다른 창을 눌러도 절대 닫히지 않아요.
+📌 **항상 위 고정 — 채용사이트 작업 중에도 앱이 사라지지 않아요**
 
-<table>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(58).png" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(59).png" width="400"/></td>
-  </tr>
-  <tr>
-    <td align="center">🌙 다크모드 — 자격증 탭</td>
-    <td align="center">☀️ 라이트모드 — 자격증 탭</td>
-  </tr>
-  <tr>
-    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(60).png" width="400"/></td>
-    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(61).png" width="400"/></td>
-  </tr>
-  <tr>
-    <td align="center">🌅 라이트모드 — 투명도 조절</td>
-    <td align="center">📋 프로젝트 탭 — 세부정보 복사</td>
-  </tr>
-</table>
+![항상 위 고정](https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(58).png)
+
+---
+
+🌙 **다크모드**
+
+![다크모드](https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(59).png)
+
+---
+
+☀️ **라이트모드**
+
+![라이트모드](https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(61).png)
 
 <br>
 
