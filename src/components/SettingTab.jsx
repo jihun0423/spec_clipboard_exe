@@ -91,7 +91,7 @@ export default function SettingTab({ user, accent, theme }) {
 
       {/* 업데이트 */}
       <Section title="🔄 업데이트" textMut={textMut}>
-        <Row label="현재버전" value="v1.0.4" surface2={surface2} textMut={textMut} text={text} />
+        <Row label="현재버전" value="v1.0.5" surface2={surface2} textMut={textMut} text={text} />
         {updateStatus === "downloaded" ? (
           <ActionButton label="🔄 지금 설치하기" onClick={handleInstallUpdate} color="#34d399" />
         ) : (
@@ -121,7 +121,7 @@ export default function SettingTab({ user, accent, theme }) {
 
       {/* 앱 정보 */}
       <Section title="ℹ️ 앱 정보" textMut={textMut}>
-        <Row label="버전"    value="v1.0.4" surface2={surface2} textMut={textMut} text={text} />
+        <Row label="버전"    value="v1.0.5" surface2={surface2} textMut={textMut} text={text} />
         <Row label="개발자" value="김지훈 (jihun0423) feat. Claude" surface2={surface2} textMut={textMut} text={text} />
         <Row label="GitHub" value="github.com/jihun0423/spec_clipboard_exe" surface2={surface2} textMut={textMut} text={text} />
       </Section>
