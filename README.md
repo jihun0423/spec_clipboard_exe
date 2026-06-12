@@ -1,69 +1,114 @@
-# 📋 스펙 복사기 (Spec Clipboard)
+# 📋 SpecClip — 스펙 복사기
 
-취업 준비 중 채용 사이트에 스펙을 반복 입력하는 번거로움을 해결하기 위해 만든 **데스크탑 클립보드 앱**입니다.  
-자격증, 학력, 경력, 프로젝트, 교육사항 등 자기소개서 작성에 필요한 정보를 한 곳에 모아두고, 버튼 하나로 복사할 수 있습니다.
+> 매 채용 사이트마다 자격증, 교육사항 등 붙여넣으려고  
+> 메모장 띄우고 → 알트탭 누르고 → 마우스로 세심하게 드래그하고 → 복사하고 → 다시 알트탭 누르고 → 붙여넣고...  
+> 이걸 **무한 반복**하는 게 너무 열받아서 만든 프로그램입니다. 🔥
+
+취업 준비생이라면 누구나 겪는 그 고통, 이제 끝냅니다.  
+자격증 번호, 학력, 경력, 프로젝트 정보를 한 곳에 모아두고 **버튼 하나로 복사**하세요.
+
+<br>
+
+## 📸 미리보기
+
+> 채용 사이트 옆에 나란히 띄워두고 사용! 다른 창을 눌러도 절대 닫히지 않아요.
+
+<table>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(58).png" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(59).png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center">🌙 다크모드 — 자격증 탭</td>
+    <td align="center">☀️ 라이트모드 — 자격증 탭</td>
+  </tr>
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(60).png" width="400"/></td>
+    <td><img src="https://raw.githubusercontent.com/jihun0423/spec_clipboard_exe/main/screenshots/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7(61).png" width="400"/></td>
+  </tr>
+  <tr>
+    <td align="center">🌅 라이트모드 — 투명도 조절</td>
+    <td align="center">📋 프로젝트 탭 — 세부정보 복사</td>
+  </tr>
+</table>
+
+<br>
+
+## 🚀 설치 방법
+
+### 👇 아래 링크 클릭하면 바로 다운로드됩니다
+
+**[⬇ SpecClip 최신버전 다운로드 (bit.ly/specclip)](https://bit.ly/specclip)**
+
+1. 다운로드된 `SpecClip_Setup_x.x.x.exe` 실행
+2. 설치 완료 후 앱 실행
+3. Google 계정으로 로그인
+4. 바로 사용 시작! 🎉
 
 <br>
 
 ## ✨ 주요 기능
 
-- **항목별 복사** — 자격증 번호, 취득일, 발급기관 등 각 필드를 개별 복사
-- **전체 복사** — 프로젝트·경력 등 긴 내용을 한 번에 복사
-- **항상 위 고정** — 채용 사이트와 나란히 띄워두고 사용 (📌 ON/OFF 토글)
-- **탭 구성** — 자격증 / 기본정보 / 학력 / 경력·봉사 / 프로젝트 / 교육사항
-- **추가·수정·삭제** — 앱 내에서 직접 데이터 관리 가능
-- **Google 로그인** — 구글 계정으로 간편 로그인
-- **클라우드 동기화** — Firebase 기반으로 어느 PC에서든 같은 데이터 접근 가능
-- **개인 데이터 보호** — 본인 계정으로 로그인한 데이터만 접근 가능
+| 기능 | 설명 |
+|------|------|
+| 📋 **항목별 복사** | 자격증 번호, 취득일, 발급기관 등 각 필드 개별 복사 |
+| 📄 **전체 복사** | 프로젝트·경력 등 긴 내용 한 번에 복사 |
+| 📎 **파일 첨부** | 자격증 사본, 경력증명서 등 PDF/이미지 업로드 및 다운로드 |
+| 📌 **항상 위 고정** | 채용 사이트와 나란히 띄워두고 사용, 다른 창 눌러도 안 닫힘! (ON/OFF 토글) |
+| ☀️🌙 **라이트/다크 모드** | 취향에 맞게 테마 변경 |
+| 🔲 **창 크기 조절** | 3단계로 창 크기 조절 |
+| 💧 **투명도 조절** | 화면 아래 슬라이더로 투명도 조절 |
+| 🔄 **자동 업데이트** | 새 버전 출시 시 앱 내에서 바로 업데이트 |
+| ☁️ **클라우드 동기화** | Firebase 기반, 어느 PC에서든 동일한 데이터 접근 |
+| 🔒 **개인 데이터 보호** | Google 계정 기반, 본인 데이터만 접근 가능 |
 
 <br>
 
-## 🚀 설치 및 실행
+## 📂 탭 구성
 
-### 일반 사용자 (설치 파일)
-
-1. [Releases](https://github.com/jihun0423/spec_clipboard_exe/releases) 페이지에서 `Setup.x.x.x.exe` 다운로드
-2. 설치 파일 실행 후 설치
-3. 앱 실행 → Google 계정으로 로그인
-4. 스펙 입력 후 사용
-
-> 💡 **빠른 다운로드**: 브라우저 주소창에 `bit.ly/specclip` 입력하면 바로 다운로드돼요!
-
-### 개발자 (소스 코드)
-
-```bash
-git clone https://github.com/jihun0423/spec_clipboard_exe.git
-cd spec_clipboard_exe
-npm install
-npm run start
-```
+- **자격증** — 자격증명, 번호, 취득일, 발급기관 + 파일 첨부
+- **기본정보** — 이름(한/영/한자) 등 기본 인적사항
+- **학력** — 학교명, 재학기간, 학점, 장학금 + 파일 첨부
+- **경력/봉사** — 기관명, 기간, 업무내용 + 경력증명서 첨부
+- **프로젝트** — 프로젝트명, 기간, 기술스택, 역할, 성과 등
+- **교육사항** — 수강 과목, 성적, 내용 등
+- **자유** — 형식 없이 제목 + 내용 + 파일 자유롭게 저장
 
 <br>
 
-## 📥 데이터 한 번에 입력하기 (AI 활용)
+## 📌 사용 방법
 
-앱에서 직접 하나씩 입력하는 것도 가능하지만, 스펙이 많다면 **AI를 활용해서 한 번에 입력**하는 게 훨씬 빨라요.
+1. 앱 실행 후 Google 계정으로 로그인
+2. 상단 탭에서 원하는 카테고리 선택
+3. **+ 추가** 버튼으로 본인 스펙 입력
+4. 카드 클릭 → 세부 항목 펼쳐짐
+5. 항목 클릭 or **복사** 버튼 → `Ctrl+V`로 붙여넣기
+6. 📌 버튼으로 항상 위 고정 ON/OFF
 
-### 1단계: Firebase UID 확인
+<br>
 
-앱 실행 후 로그인한 상태에서 **Ctrl+Shift+I** → Console 탭에서:
-```
-UID: 여기에표시됨
-```
+## ⚡ 초기 데이터 한 번에 입력하기 (선택사항)
 
-### 2단계: AI에게 아래 프롬프트 전달
+스펙이 많다면 하나씩 입력하는 게 번거로울 수 있어요.  
+**AI를 활용하면 한 번에 모든 데이터를 입력**할 수 있어요!
 
-Claude, ChatGPT 등 AI에게 아래 프롬프트를 복사해서 본인 정보와 함께 전달하세요.
+### 1단계 — 본인 UID 확인
+
+앱 실행 후 로그인 → 우측 상단 ⚙️ 설정 탭 → **UID 복사** 버튼 클릭
+
+### 2단계 — AI에게 본인 스펙 전달
+
+Claude, ChatGPT 등 AI에게 아래 프롬프트와 함께 본인 스펙을 전달하세요:
 
 ```
 아래 내 스펙 정보를 보고 seed.js 파일을 작성해줘.
 
 [Firebase 설정]
-projectId: (본인 Firebase 프로젝트 ID)
-UID: (위에서 확인한 본인 UID)
+projectId: spec-clipboard
+UID: (위에서 복사한 본인 UID)
 
 [자격증]
-(자격증명 / 취득일 / 자격번호 / 발급기관 형식으로 입력)
+(자격증명 / 취득일 / 자격번호 / 발급기관)
 
 [기본정보]
 (이름 한글/영어/한자 등)
@@ -72,7 +117,7 @@ UID: (위에서 확인한 본인 UID)
 (학교명 / 재학기간 / 학점 / 장학금 등)
 
 [경력/봉사]
-(기관명 / 구분(인턴/봉사) / 기간 / 업무내용)
+(기관명 / 구분 / 기간 / 업무내용)
 
 [프로젝트]
 (프로젝트명 / 기간 / 기술스택 / 역할 / 목표 / 성과 / 진행내용 / URL)
@@ -80,51 +125,35 @@ UID: (위에서 확인한 본인 UID)
 [교육사항]
 (과목명 / 수강기간 / 성적 / 평점 / 학점 / 과목설명)
 
-위 정보를 아래 seed.js 형식에 맞게 작성해줘.
-Firebase에 데이터를 넣는 스크립트야.
-작성 후 "node seed.js" 명령어로 실행하면 돼.
+seed.js 형식으로 작성해줘. Firebase Firestore에 데이터를 넣는 스크립트야.
 ```
 
-### 3단계: seed.js 실행
+### 3단계 — Node.js 설치 확인
 
-AI가 생성한 `seed.js` 파일을 프로젝트 루트에 저장하고:
+`seed.js`를 실행하려면 Node.js가 필요해요.  
+터미널(명령 프롬프트)에서 아래 명령어로 설치 여부를 확인하세요:
+
+```bash
+node --version
+```
+
+버전 번호가 뜨면 설치된 거예요. 없으면 https://nodejs.org 에서 설치하세요.
+
+### 4단계 — seed.js 실행
+
+1. AI가 생성한 `seed.js` 파일을 바탕화면 등 원하는 위치에 저장
+2. 해당 폴더에서 터미널(명령 프롬프트) 열기
+   - Windows: 폴더에서 `Shift + 우클릭` → "PowerShell 창 열기" 또는 "터미널에서 열기"
+3. 아래 명령어 실행:
 
 ```bash
 node seed.js
 ```
 
-실행하면 모든 데이터가 Firebase에 한 번에 입력돼요!
+4. 터미널에 `🎉 모든 데이터 입력 완료!` 가 뜨면 성공!
+5. 앱을 새로고침하면 데이터가 모두 들어와 있어요.
 
-> ⚠️ **주의**: `seed.js`에는 본인의 개인정보와 Firebase UID가 포함되므로 깃허브에 올리지 마세요. `.gitignore`에 `seed.js`가 등록되어 있는지 확인하세요.
-
-<br>
-
-## 📁 파일 구조
-
-```
-📦 spec_clipboard_exe
- ┣ 📂 src
- ┃ ┣ 📂 components       # 탭별 컴포넌트
- ┃ ┣ 📂 hooks            # Firebase 커스텀 훅
- ┃ ┣ 📂 pages            # 로그인 페이지
- ┃ ┣ 📄 App.jsx          # 메인 앱
- ┃ ┗ 📄 firebase.js      # Firebase 설정
- ┣ 📄 electron.js        # Electron 메인 프로세스
- ┣ 📄 preload.js         # Electron preload 스크립트
- ┣ 📄 package.json
- └ 📄 README.md
-```
-
-<br>
-
-## 📌 사용 방법
-
-1. 앱 실행 후 Google 계정으로 로그인
-2. 상단 탭에서 원하는 카테고리 선택
-3. **+ 추가** 버튼으로 본인의 스펙 입력 (또는 위의 AI 활용 방법으로 한 번에 입력)
-4. 카드를 클릭하면 세부 항목이 펼쳐짐
-5. 각 항목 옆 **복사** 버튼 클릭 → `Ctrl+V`로 붙여넣기
-6. 📌 버튼으로 항상 위 고정 ON/OFF 가능
+> ⚠️ **주의**: `seed.js`에는 본인의 개인정보와 Firebase UID가 포함되므로 절대 깃허브나 외부에 공유하지 마세요.
 
 <br>
 
@@ -134,15 +163,14 @@ node seed.js
 |------|------|
 | Frontend | React 19, Vite |
 | Desktop | Electron |
-| Backend | Firebase Firestore |
+| Database | Firebase Firestore |
+| Storage | Firebase Storage |
 | Auth | Firebase Authentication (Google) |
 | Build | electron-builder |
 | OS | Windows |
 
 <br>
 
-## ☁️ 데이터 동기화
+## 👨‍💻 개발자
 
-Firebase Firestore를 사용하여 데이터를 클라우드에 저장합니다.  
-Google 계정으로 로그인하면 어느 PC에서든 동일한 데이터에 접근할 수 있습니다.  
-각 사용자의 데이터는 완전히 분리되어 본인만 접근 가능합니다.
+김지훈 (jihun0423) feat. Claude
