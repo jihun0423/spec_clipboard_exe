@@ -6,4 +6,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   openExternal: (url) => ipcRenderer.send("open-external", url),
   resizeWindow: (direction) => ipcRenderer.send("resize-window", direction),
   setOpacity: (value) => ipcRenderer.send("set-opacity", value),
+  checkForUpdate: () => ipcRenderer.send("check-for-update"),
+  installUpdate: () => ipcRenderer.send("install-update"),
+  onUpdateStatus: (callback) => ipcRenderer.on("update-status", (e, status, info) => callback(status, info)),
+  onUpdateProgress: (callback) => ipcRenderer.on("update-progress", (e, percent) => callback(percent)),
 });

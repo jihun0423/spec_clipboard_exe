@@ -10,29 +10,32 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
   const [uploading, setUploading] = useState({});
+  const [formFile, setFormFile] = useState(null);
 
-  const openAdd = () => { setDraft(EMPTY); setForm("add"); };
-  const openEdit = (item) => { setDraft(item); setForm(item.id); };
-  const close = () => { setForm(null); setDraft(EMPTY); };
+  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); };
+  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); };
+  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); };
 
-  const handleSave = async () => {
+    const handleSave = async () => {
     if (!draft.title) return;
-    if (form === "add") await onAdd(draft);
-    else await onUpdate(form, draft);
+    if (form === "add") {
+        const newId = await onAdd(draft);
+        if (formFile && newId) await uploadFile({ id: newId, ...draft }, formFile);
+    } else {
+        await onUpdate(form, draft);
+        if (formFile) await uploadFile({ id: form, ...draft }, formFile);
+    }
     close();
-  };
+    };
 
-  const handleFileUpload = async (item, file) => {
-    if (!file) return;
+  const uploadFile = async (item, file) => {
     setUploading(prev => ({ ...prev, [item.id]: true }));
     try {
       const fileRef = ref(storage, `users/${uid}/free/${item.id}/${file.name}`);
       await uploadBytes(fileRef, file);
       const url = await getDownloadURL(fileRef);
       await onUpdate(item.id, { ...item, fileUrl: url, fileName: file.name });
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setUploading(prev => ({ ...prev, [item.id]: false }));
   };
 
@@ -42,9 +45,7 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
       const fileRef = ref(storage, `users/${uid}/free/${item.id}/${item.fileName}`);
       await deleteObject(fileRef);
       await onUpdate(item.id, { ...item, fileUrl: null, fileName: null });
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
   };
 
   return (
@@ -58,7 +59,8 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
       {form && (
         <FormBox draft={draft} setDraft={setDraft}
           fields={[["제목", "title"], ["내용", "content"]]}
-          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme}
+          formFile={formFile} setFormFile={setFormFile} />
       )}
 
       {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
@@ -66,8 +68,7 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
           <CardItem key={item.id}
             title={item.title}
             subtitle={item.content?.slice(0, 40) + (item.content?.length > 40 ? "..." : "")}
-            accent={accent}
-            theme={theme}
+            accent={accent} theme={theme}
             fields={[
               { label: "제목", value: item.title },
               { label: "내용", value: item.content },
@@ -76,14 +77,10 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
             onEdit={() => openEdit(item)}
             onDelete={() => onDelete(item.id)}
             footer={
-              <FileSection
-                item={item}
-                uploading={uploading[item.id]}
-                onUpload={(file) => handleFileUpload(item, file)}
+              <FileSection item={item} uploading={uploading[item.id]}
+                onUpload={(file) => uploadFile(item, file)}
                 onDelete={() => handleFileDelete(item)}
-                accent={accent}
-                theme={theme}
-              />
+                accent={accent} theme={theme} />
             }
           />
         ))
@@ -97,32 +94,21 @@ function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
   const textMut = theme?.textMut || "#7a80a0";
 
   const handleDownload = () => {
-    if (window.electronAPI) {
-      window.electronAPI.downloadFile(item.fileUrl, item.fileName);
-    } else {
-      window.open(item.fileUrl, "_blank");
-    }
+    if (window.electronAPI) window.electronAPI.downloadFile(item.fileUrl, item.fileName);
+    else window.open(item.fileUrl, "_blank");
   };
 
   return (
-    <div style={{
-      borderTop: `1px solid ${border}`,
-      padding: "8px 10px",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-    }}>
+    <div style={{ borderTop: `1px solid ${border}`, padding: "8px 10px",
+      display: "flex", alignItems: "center", gap: "8px" }}>
       <span style={{ fontSize: "11px", color: textMut, flexShrink: 0 }}>📎 파일</span>
       {item.fileUrl ? (
         <>
           <button onClick={handleDownload} style={{
-            fontSize: "11px", color: accent, flex: 1,
-            background: "transparent", border: "none",
-            textAlign: "left", cursor: "pointer", padding: 0,
+            fontSize: "11px", color: accent, flex: 1, background: "transparent",
+            border: "none", textAlign: "left", cursor: "pointer", padding: 0,
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-          }}>
-            ⬇ {item.fileName}
-          </button>
+          }}>⬇ {item.fileName}</button>
           <button onClick={onDelete} style={{
             background: "#f87171", color: "#fff", border: "none",
             borderRadius: "5px", padding: "3px 8px", fontSize: "11px",
@@ -139,8 +125,7 @@ function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
           <input type="file" accept=".pdf,.jpg,.jpeg,.png,.zip,.docx,.xlsx"
             style={{ display: "none" }}
             onChange={(e) => onUpload(e.target.files[0])}
-            disabled={uploading}
-          />
+            disabled={uploading} />
         </label>
       )}
     </div>

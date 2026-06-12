@@ -42,6 +42,7 @@ export function useFirestore(uid) {
   const addItem = async (col, item) => {
     const ref = doc(collection(db, "users", uid, col));
     await setDoc(ref, { ...item, order: Date.now() });
+    return ref.id; // 생성된 ID 반환
   };
 
   const updateItem = async (col, id, item) => {

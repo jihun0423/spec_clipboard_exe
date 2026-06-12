@@ -9,20 +9,25 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
   const [uploading, setUploading] = useState({});
+  const [formFile, setFormFile] = useState(null);
 
-  const openAdd = () => { setDraft(EMPTY); setForm("add"); };
-  const openEdit = (item) => { setDraft(item); setForm(item.id); };
-  const close = () => { setForm(null); setDraft(EMPTY); };
+  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); };
+  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); };
+  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); };
 
   const handleSave = async () => {
     if (!draft.name) return;
-    if (form === "add") await onAdd(draft);
-    else await onUpdate(form, draft);
+    if (form === "add") {
+      const newId = await onAdd(draft);
+      if (formFile && newId) await uploadFile({ id: newId, ...draft }, formFile);
+    } else {
+      await onUpdate(form, draft);
+      if (formFile) await uploadFile({ id: form, ...draft }, formFile);
+    }
     close();
   };
 
-  const handleFileUpload = async (item, file) => {
-    if (!file) return;
+  const uploadFile = async (item, file) => {
     setUploading(prev => ({ ...prev, [item.id]: true }));
     try {
       const fileRef = ref(storage, `users/${uid}/certs/${item.id}/${file.name}`);
@@ -33,6 +38,11 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
       console.error(e);
     }
     setUploading(prev => ({ ...prev, [item.id]: false }));
+  };
+
+  const handleFileUpload = async (item, file) => {
+    if (!file) return;
+    await uploadFile(item, file);
   };
 
   const handleFileDelete = async (item) => {
@@ -57,7 +67,10 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
       {form && (
         <FormBox draft={draft} setDraft={setDraft}
           fields={[["자격증명","name"],["번호","number"],["취득일","date"],["발급기관","issuer"]]}
-          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme}
+          formFile={formFile} setFormFile={setFormFile}
+          showFileUpload={form !== "add"}
+        />
       )}
 
       {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
@@ -147,7 +160,7 @@ function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
   );
 }
 
-export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, theme }) {
+export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, theme, formFile, setFormFile, showFileUpload }) {
   const surface = theme?.surface || "#1a1d27";
   const surface2 = theme?.surface2 || "#22263a";
   const border = theme?.border || "#2e3350";
@@ -169,6 +182,39 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
               color: text, outline: "none" }} />
         </div>
       ))}
+
+      {/* 파일 업로드 칸 */}
+      {setFormFile && (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+          <span style={{ fontSize: "11px", color: textMut, width: "52px", flexShrink: 0 }}>📎 파일</span>
+          {formFile ? (
+            <div style={{ flex: 1, display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ fontSize: "11px", color: text, flex: 1,
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {formFile.name}
+              </span>
+              <button onClick={() => setFormFile(null)} style={{
+                background: "#f87171", color: "#fff", border: "none",
+                borderRadius: "5px", padding: "2px 6px", fontSize: "11px",
+                cursor: "pointer", flexShrink: 0,
+              }}>✕</button>
+            </div>
+          ) : (
+            <label style={{
+              background: surface2, color: accent, border: `1px solid ${border}`,
+              borderRadius: "6px", padding: "4px 10px", fontSize: "11px",
+              fontWeight: 600, cursor: "pointer",
+            }}>
+              📤 파일 선택
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.zip,.docx,.xlsx"
+                style={{ display: "none" }}
+                onChange={(e) => setFormFile(e.target.files[0])}
+              />
+            </label>
+          )}
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
         <button onClick={onSave} style={{
           flex: 1, background: accent, color: "#fff", border: "none",

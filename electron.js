@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
+const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const http = require("http");
 const fs = require("fs");
@@ -31,6 +32,38 @@ function serveStatic(port) {
   });
   server.listen(port);
   return server;
+}
+
+function setupAutoUpdater() {
+  autoUpdater.setFeedURL({
+    provider: "github",
+    owner: "jihun0423",
+    repo: "spec_clipboard_exe",
+  });
+
+  autoUpdater.on("checking-for-update", () => {
+    win?.webContents.send("update-status", "checking");
+  });
+
+  autoUpdater.on("update-available", (info) => {
+    win?.webContents.send("update-status", "available", info.version);
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    win?.webContents.send("update-status", "not-available");
+  });
+
+  autoUpdater.on("download-progress", (progress) => {
+    win?.webContents.send("update-progress", Math.floor(progress.percent));
+  });
+
+  autoUpdater.on("update-downloaded", () => {
+    win?.webContents.send("update-status", "downloaded");
+  });
+
+  autoUpdater.on("error", (err) => {
+    win?.webContents.send("update-status", "error", err.message);
+  });
 }
 
 function createWindow() {
@@ -73,6 +106,8 @@ function createWindow() {
   } else {
     serveStatic(5174);
     win.loadURL("http://localhost:5174");
+    // 프로덕션에서만 업데이트 체크
+    setTimeout(() => setupAutoUpdater() && autoUpdater.checkForUpdates(), 3000);
   }
 }
 
@@ -109,6 +144,14 @@ ipcMain.on("resize-window", (event, direction) => {
 
 ipcMain.on("set-opacity", (event, value) => {
   if (win) win.setOpacity(value);
+});
+
+ipcMain.on("check-for-update", () => {
+  if (!isDev) autoUpdater.checkForUpdates();
+});
+
+ipcMain.on("install-update", () => {
+  autoUpdater.quitAndInstall();
 });
 
 app.whenReady().then(createWindow);
