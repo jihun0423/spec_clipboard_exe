@@ -4,7 +4,7 @@ import { FormBox } from "./CertTab";
 
 const EMPTY = { name: "", period: "", stack: "", role: "", goal: "", result: "", desc: "", url: "" };
 
-export default function ProjectTab({ data, loading, accent, onAdd, onUpdate, onDelete }) {
+export default function ProjectTab({ data, loading, accent, onAdd, onUpdate, onDelete, theme }) {
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
 
@@ -39,15 +39,16 @@ export default function ProjectTab({ data, loading, accent, onAdd, onUpdate, onD
             ["진행내용",   "desc"],
             ["URL",        "url"],
           ]}
-          onSave={handleSave} onClose={close} accent={accent} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
       )}
 
-      {loading ? <p style={{ color: "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
+      {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
           <CardItem key={item.id}
             title={item.name}
             subtitle={`${item.period} · ${item.stack}`}
             accent={accent}
+            theme={theme}
             fields={[
               { label: "프로젝트명", value: item.name },
               { label: "기간",       value: item.period },

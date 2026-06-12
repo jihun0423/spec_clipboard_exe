@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+import { storage } from "../firebase";
 import CardItem from "./CardItem";
 import { FormBox } from "./CertTab";
 
 const EMPTY = { org: "", type: "", period: "", desc: "" };
 
-export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDelete }) {
+export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDelete, uid, theme }) {
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
+  const [uploading, setUploading] = useState({});
 
   const openAdd = () => { setDraft(EMPTY); setForm("add"); };
   const openEdit = (item) => { setDraft(item); setForm(item.id); };
@@ -17,6 +20,31 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
     if (form === "add") await onAdd(draft);
     else await onUpdate(form, draft);
     close();
+  };
+
+  const handleFileUpload = async (item, file) => {
+    if (!file) return;
+    setUploading(prev => ({ ...prev, [item.id]: true }));
+    try {
+      const fileRef = ref(storage, `users/${uid}/career/${item.id}/${file.name}`);
+      await uploadBytes(fileRef, file);
+      const url = await getDownloadURL(fileRef);
+      await onUpdate(item.id, { ...item, fileUrl: url, fileName: file.name });
+    } catch (e) {
+      console.error(e);
+    }
+    setUploading(prev => ({ ...prev, [item.id]: false }));
+  };
+
+  const handleFileDelete = async (item) => {
+    if (!item.fileUrl) return;
+    try {
+      const fileRef = ref(storage, `users/${uid}/career/${item.id}/${item.fileName}`);
+      await deleteObject(fileRef);
+      await onUpdate(item.id, { ...item, fileUrl: null, fileName: null });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
@@ -35,15 +63,16 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
             ["기간",     "period"],
             ["업무내용", "desc"],
           ]}
-          onSave={handleSave} onClose={close} accent={accent} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
       )}
 
-      {loading ? <p style={{ color: "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
+      {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
           <CardItem key={item.id}
             title={`[${item.type}] ${item.org}`}
             subtitle={item.period}
             accent={accent}
+            theme={theme}
             fields={[
               { label: "기관명",   value: item.org },
               { label: "구분",     value: item.type },
@@ -53,9 +82,74 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
             allCopyText={`${item.org} (${item.type}) ${item.period}\n${item.desc}`}
             onEdit={() => openEdit(item)}
             onDelete={() => onDelete(item.id)}
+            footer={
+              <FileSection
+                item={item}
+                uploading={uploading[item.id]}
+                onUpload={(file) => handleFileUpload(item, file)}
+                onDelete={() => handleFileDelete(item)}
+                accent={accent}
+                theme={theme}
+              />
+            }
           />
         ))
       }
+    </div>
+  );
+}
+
+function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
+  const border = theme?.border || "#2e3350";
+  const textMut = theme?.textMut || "#7a80a0";
+
+  const handleDownload = () => {
+    if (window.electronAPI) {
+      window.electronAPI.downloadFile(item.fileUrl, item.fileName);
+    } else {
+      window.open(item.fileUrl, "_blank");
+    }
+  };
+
+  return (
+    <div style={{
+      borderTop: `1px solid ${border}`,
+      padding: "8px 10px",
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    }}>
+      <span style={{ fontSize: "11px", color: textMut, flexShrink: 0 }}>📎 파일</span>
+      {item.fileUrl ? (
+        <>
+          <button onClick={handleDownload} style={{
+            fontSize: "11px", color: accent, flex: 1,
+            background: "transparent", border: "none",
+            textAlign: "left", cursor: "pointer", padding: 0,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          }}>
+            ⬇ {item.fileName}
+          </button>
+          <button onClick={onDelete} style={{
+            background: "#f87171", color: "#fff", border: "none",
+            borderRadius: "5px", padding: "3px 8px", fontSize: "11px",
+            fontWeight: 600, cursor: "pointer", flexShrink: 0,
+          }}>삭제</button>
+        </>
+      ) : (
+        <label style={{
+          background: uploading ? (theme?.surface2 || "#22263a") : accent,
+          color: "#fff", borderRadius: "5px", padding: "3px 10px",
+          fontSize: "11px", fontWeight: 600, cursor: "pointer", flexShrink: 0,
+        }}>
+          {uploading ? "업로드 중..." : "📤 업로드"}
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png"
+            style={{ display: "none" }}
+            onChange={(e) => onUpload(e.target.files[0])}
+            disabled={uploading}
+          />
+        </label>
+      )}
     </div>
   );
 }

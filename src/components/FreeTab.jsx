@@ -2,10 +2,11 @@ import { useState } from "react";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../firebase";
 import CardItem from "./CardItem";
+import { FormBox } from "./CertTab";
 
-const EMPTY = { name: "", number: "", date: "", issuer: "" };
+const EMPTY = { title: "", content: "" };
 
-export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDelete, uid, theme }) {
+export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDelete, uid, theme }) {
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
   const [uploading, setUploading] = useState({});
@@ -15,7 +16,7 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
   const close = () => { setForm(null); setDraft(EMPTY); };
 
   const handleSave = async () => {
-    if (!draft.name) return;
+    if (!draft.title) return;
     if (form === "add") await onAdd(draft);
     else await onUpdate(form, draft);
     close();
@@ -25,7 +26,7 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
     if (!file) return;
     setUploading(prev => ({ ...prev, [item.id]: true }));
     try {
-      const fileRef = ref(storage, `users/${uid}/certs/${item.id}/${file.name}`);
+      const fileRef = ref(storage, `users/${uid}/free/${item.id}/${file.name}`);
       await uploadBytes(fileRef, file);
       const url = await getDownloadURL(fileRef);
       await onUpdate(item.id, { ...item, fileUrl: url, fileName: file.name });
@@ -38,7 +39,7 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
   const handleFileDelete = async (item) => {
     if (!item.fileUrl) return;
     try {
-      const fileRef = ref(storage, `users/${uid}/certs/${item.id}/${item.fileName}`);
+      const fileRef = ref(storage, `users/${uid}/free/${item.id}/${item.fileName}`);
       await deleteObject(fileRef);
       await onUpdate(item.id, { ...item, fileUrl: null, fileName: null });
     } catch (e) {
@@ -52,27 +53,26 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
         width: "100%", background: accent, color: "#fff", border: "none",
         borderRadius: "8px", padding: "8px", fontSize: "12px",
         fontWeight: 600, cursor: "pointer", marginBottom: "8px",
-      }}>+ 자격증 추가</button>
+      }}>+ 항목 추가</button>
 
       {form && (
         <FormBox draft={draft} setDraft={setDraft}
-          fields={[["자격증명","name"],["번호","number"],["취득일","date"],["발급기관","issuer"]]}
+          fields={[["제목", "title"], ["내용", "content"]]}
           onSave={handleSave} onClose={close} accent={accent} theme={theme} />
       )}
 
       {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
           <CardItem key={item.id}
-            title={item.name}
-            subtitle={`${item.issuer} · ${item.date}`}
+            title={item.title}
+            subtitle={item.content?.slice(0, 40) + (item.content?.length > 40 ? "..." : "")}
             accent={accent}
             theme={theme}
             fields={[
-              { label: "자격증명", value: item.name },
-              { label: "번호",     value: item.number },
-              { label: "취득일",   value: item.date },
-              { label: "발급기관", value: item.issuer },
+              { label: "제목", value: item.title },
+              { label: "내용", value: item.content },
             ]}
+            allCopyText={`${item.title}\n${item.content}`}
             onEdit={() => openEdit(item)}
             onDelete={() => onDelete(item.id)}
             footer={
@@ -136,51 +136,13 @@ function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
           fontSize: "11px", fontWeight: 600, cursor: "pointer", flexShrink: 0,
         }}>
           {uploading ? "업로드 중..." : "📤 업로드"}
-          <input type="file" accept=".pdf,.jpg,.jpeg,.png"
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.zip,.docx,.xlsx"
             style={{ display: "none" }}
             onChange={(e) => onUpload(e.target.files[0])}
             disabled={uploading}
           />
         </label>
       )}
-    </div>
-  );
-}
-
-export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, theme }) {
-  const surface = theme?.surface || "#1a1d27";
-  const surface2 = theme?.surface2 || "#22263a";
-  const border = theme?.border || "#2e3350";
-  const text = theme?.text || "#e8eaf0";
-  const textMut = theme?.textMut || "#7a80a0";
-
-  return (
-    <div style={{ background: surface, border: `1px solid ${accent}`,
-      borderRadius: "10px", padding: "12px", marginBottom: "8px" }}>
-      {fields.map(([label, key]) => (
-        <div key={key} style={{ display: "flex", alignItems: "center",
-          gap: "8px", marginBottom: "6px" }}>
-          <span style={{ fontSize: "11px", color: textMut, width: "52px", flexShrink: 0 }}>
-            {label}
-          </span>
-          <input value={draft[key] || ""} onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-            style={{ flex: 1, background: surface2, border: `1px solid ${border}`,
-              borderRadius: "6px", padding: "5px 8px", fontSize: "12px",
-              color: text, outline: "none" }} />
-        </div>
-      ))}
-      <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
-        <button onClick={onSave} style={{
-          flex: 1, background: accent, color: "#fff", border: "none",
-          borderRadius: "6px", padding: "6px", fontSize: "12px",
-          fontWeight: 600, cursor: "pointer",
-        }}>저장</button>
-        <button onClick={onClose} style={{
-          flex: 1, background: surface2, color: textMut, border: "none",
-          borderRadius: "6px", padding: "6px", fontSize: "12px",
-          fontWeight: 600, cursor: "pointer",
-        }}>취소</button>
-      </div>
     </div>
   );
 }

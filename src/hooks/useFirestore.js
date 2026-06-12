@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   collection,
   doc,
-  getDocs,
   setDoc,
   deleteDoc,
   onSnapshot,
@@ -17,10 +16,11 @@ export function useFirestore(uid) {
     career: [],
     projects: [],
     coursework: [],
+    free: [],
   });
   const [loading, setLoading] = useState(true);
 
-  const COLLECTIONS = ["certs", "basic", "education", "career", "projects", "coursework"];
+  const COLLECTIONS = ["certs", "basic", "education", "career", "projects", "coursework", "free"];
 
   useEffect(() => {
     if (!uid) return;

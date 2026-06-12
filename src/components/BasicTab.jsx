@@ -4,7 +4,7 @@ import { FormBox } from "./CertTab";
 
 const EMPTY = { label: "", value: "" };
 
-export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDelete }) {
+export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDelete, theme }) {
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
 
@@ -30,18 +30,19 @@ export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDel
       {form && (
         <FormBox draft={draft} setDraft={setDraft}
           fields={[["항목명", "label"], ["값", "value"]]}
-          onSave={handleSave} onClose={close} accent={accent} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
       )}
 
-      {loading ? <p style={{ color: "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
+      {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
           <CardItem key={item.id}
             title={item.label}
             subtitle={item.value}
             accent={accent}
+            theme={theme}
             fields={[
               { label: "항목명", value: item.label },
-              { label: "값",    value: item.value },
+              { label: "값",     value: item.value },
             ]}
             onEdit={() => openEdit(item)}
             onDelete={() => onDelete(item.id)}

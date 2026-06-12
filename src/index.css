@@ -11,8 +11,10 @@ body {
   overflow: hidden;
 }
 
+/* 세로 스크롤바 */
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -21,6 +23,16 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: #2e3350;
+  border-radius: 2px;
+}
+
+/* 탭바 가로 스크롤바 */
+#tabbar::-webkit-scrollbar {
+  height: 3px;
+}
+
+#tabbar::-webkit-scrollbar-thumb {
+  background: #5b6cff;
   border-radius: 2px;
 }
 

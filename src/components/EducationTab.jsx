@@ -4,7 +4,7 @@ import { FormBox } from "./CertTab";
 
 const EMPTY = { name: "", period: "", gpa_total: "", gpa_major: "", credits_total: "", credits_major: "", scholarship: "" };
 
-export default function EducationTab({ data, loading, accent, onAdd, onUpdate, onDelete }) {
+export default function EducationTab({ data, loading, accent, onAdd, onUpdate, onDelete, theme }) {
   const [form, setForm] = useState(null);
   const [draft, setDraft] = useState(EMPTY);
 
@@ -38,15 +38,16 @@ export default function EducationTab({ data, loading, accent, onAdd, onUpdate, o
             ["전공이수", "credits_major"],
             ["장학금",   "scholarship"],
           ]}
-          onSave={handleSave} onClose={close} accent={accent} />
+          onSave={handleSave} onClose={close} accent={accent} theme={theme} />
       )}
 
-      {loading ? <p style={{ color: "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
+      {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
           <CardItem key={item.id}
             title={item.name}
             subtitle={item.period}
             accent={accent}
+            theme={theme}
             fields={[
               { label: "학교명",   value: item.name },
               { label: "재학기간", value: item.period },

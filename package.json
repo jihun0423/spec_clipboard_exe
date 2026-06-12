@@ -1,7 +1,7 @@
 {
   "name": "spec-clipboard",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.4",
   "main": "electron.js",
   "scripts": {
     "dev": "vite",
@@ -14,19 +14,23 @@
   },
   "build": {
     "appId": "com.specclipboard.app",
-    "productName": "스펙 복사기",
+    "productName": "SpecClip",
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": null,
+      "uninstallerIcon": null,
+      "installerHeaderIcon": null,
+      "artifactName": "SpecClip_Setup_${version}.exe"
+    },
     "files": [
       "dist/**/*",
       "electron.js",
       "preload.js"
-    ],
-    "win": {
-  "target": "nsis"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true
-    }
+    ]
   },
   "dependencies": {
     "firebase": "^12.14.0",

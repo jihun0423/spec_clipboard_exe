@@ -9,9 +9,17 @@ export default function CardItem({
   onEdit,
   onDelete,
   allCopyText,
+  footer,
+  theme,
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const surface = theme?.surface || "#1a1d27";
+  const surface2 = theme?.surface2 || "#22263a";
+  const border = theme?.border || "#2e3350";
+  const text = theme?.text || "#e8eaf0";
+  const textMut = theme?.textMut || "#7a80a0";
 
   const handleAllCopy = () => {
     navigator.clipboard.writeText(allCopyText);
@@ -21,8 +29,8 @@ export default function CardItem({
 
   return (
     <div style={{
-      background: "#1a1d27",
-      border: `1px solid ${open ? accent : "#2e3350"}`,
+      background: surface,
+      border: `1px solid ${open ? accent : border}`,
       borderRadius: "10px",
       marginBottom: "6px",
       overflow: "hidden",
@@ -39,7 +47,7 @@ export default function CardItem({
         <div style={{ display: "flex", gap: "4px", flexShrink: 0, marginLeft: "auto" }}
           onClick={(e) => e.stopPropagation()}>
           <button onClick={onEdit} style={{
-            background: "#22263a", color: "#7a80a0", border: "none",
+            background: surface2, color: textMut, border: "none",
             borderRadius: "6px", padding: "4px 8px", fontSize: "11px",
             fontWeight: 600, cursor: "pointer",
           }}>✎ 수정</button>
@@ -50,16 +58,16 @@ export default function CardItem({
           }}>✕ 삭제</button>
         </div>
 
-        {/* 제목 (클릭 시 토글) */}
+        {/* 제목 */}
         <div style={{ flex: 1, minWidth: 0, order: -1 }}
           onClick={() => setOpen(!open)}>
           <div style={{
-            fontSize: "13px", fontWeight: 600, color: "#e8eaf0",
+            fontSize: "13px", fontWeight: 600, color: text,
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
           }}>{title}</div>
           {subtitle && (
             <div style={{
-              fontSize: "11px", color: "#7a80a0", marginTop: "2px",
+              fontSize: "11px", color: textMut, marginTop: "2px",
               whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
             }}>{subtitle}</div>
           )}
@@ -68,24 +76,27 @@ export default function CardItem({
 
       {/* 펼쳐진 필드 */}
       {open && (
-        <div style={{ padding: "0 10px 10px", borderTop: "1px solid #2e3350" }}>
-          <div style={{ paddingTop: "8px" }}>
+        <div style={{ borderTop: `1px solid ${border}` }}>
+          <div style={{ padding: "8px 10px 4px" }}>
             {fields.map(({ label, value }) => (
-              <FieldRow key={label} label={label} value={value} accent={accent} />
+              <FieldRow key={label} label={label} value={value} accent={accent} theme={theme} />
             ))}
           </div>
           {allCopyText && (
-            <button onClick={handleAllCopy} style={{
-              width: "100%",
-              background: copied ? "rgba(52,211,153,0.15)" : accent,
-              color: copied ? "#34d399" : "#fff",
-              border: "none", borderRadius: "7px",
-              padding: "7px", fontSize: "12px",
-              fontWeight: 600, cursor: "pointer", marginTop: "4px",
-            }}>
-              {copied ? "✓ 복사됨" : "📋 전체 복사"}
-            </button>
+            <div style={{ padding: "0 10px 8px" }}>
+              <button onClick={handleAllCopy} style={{
+                width: "100%",
+                background: copied ? "rgba(52,211,153,0.15)" : accent,
+                color: copied ? "#34d399" : "#fff",
+                border: "none", borderRadius: "7px",
+                padding: "7px", fontSize: "12px",
+                fontWeight: 600, cursor: "pointer",
+              }}>
+                {copied ? "✓ 복사됨" : "📋 전체 복사"}
+              </button>
+            </div>
           )}
+          {footer && footer}
         </div>
       )}
     </div>
