@@ -33,7 +33,7 @@
 
 ### 👇 아래 링크 클릭하면 바로 다운로드됩니다
 
-**[⬇ SpecClip 최신버전 다운로드 (bit.ly/specclip)](https://bit.ly/specclip)**
+**[⬇ SpecClip 최신버전 다운로드](https://github.com/jihun0423/spec_clipboard_exe/releases/latest)**
 
 1. 다운로드된 `SpecClip_Setup_x.x.x.exe` 실행
 2. 설치 완료 후 앱 실행
