@@ -1,3 +1,5 @@
+<meta name="google-site-verification" content="8JiRJT4JmswHHKASXL_5Dld2DPAHmgbHtyaU4p00tWo" />
+
 # 📋 SpecClip — 스펙 복사기
 
 > 매 채용 사이트마다 자격증, 교육사항 등 붙여넣으려고  
