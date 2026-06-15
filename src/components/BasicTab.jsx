@@ -11,10 +11,11 @@ export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDel
   const [draft, setDraft] = useState(EMPTY);
   const [uploading, setUploading] = useState({});
   const [formFile, setFormFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
-  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); };
-  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); };
-  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); };
+  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); setEditingId(null); };
+  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); setEditingId(item.id); };
+  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); setEditingId(null); };
 
   const handleSave = async () => {
     if (!draft.label) return;
@@ -56,7 +57,8 @@ export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDel
         fontWeight: 600, cursor: "pointer", marginBottom: "8px",
       }}>+ 항목 추가</button>
 
-      {form && (
+      {/* 추가 폼 */}
+      {form === "add" && (
         <FormBox draft={draft} setDraft={setDraft}
           fields={[["항목명", "label"], ["값", "value"]]}
           onSave={handleSave} onClose={close} accent={accent} theme={theme}
@@ -65,22 +67,33 @@ export default function BasicTab({ data, loading, accent, onAdd, onUpdate, onDel
 
       {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
-          <CardItem key={item.id}
-            title={item.label} subtitle={item.value}
-            accent={accent} theme={theme}
-            fields={[
-              { label: "항목명", value: item.label },
-              { label: "값",     value: item.value },
-            ]}
-            onEdit={() => openEdit(item)}
-            onDelete={() => onDelete(item.id)}
-            footer={
-              <FileSection item={item} uploading={uploading[item.id]}
-                onUpload={(file) => uploadFile(item, file)}
-                onDelete={() => handleFileDelete(item)}
-                accent={accent} theme={theme} />
-            }
-          />
+          <div key={item.id}>
+            <CardItem
+              title={item.label}
+              subtitle={item.value}
+              accent={accent} theme={theme}
+              fields={[
+                { label: "항목명", value: item.label },
+                { label: "값",     value: item.value },
+                ...(item.customFields || []).map(f => ({ label: f.label, value: f.value })),
+              ]}
+              onEdit={() => openEdit(item)}
+              onDelete={() => onDelete(item.id)}
+              footer={
+                <FileSection item={item} uploading={uploading[item.id]}
+                  onUpload={(file) => uploadFile(item, file)}
+                  onDelete={() => handleFileDelete(item)}
+                  accent={accent} theme={theme} />
+              }
+            />
+            {/* 수정 폼 - 카드 바로 아래 인라인 */}
+            {editingId === item.id && (
+              <FormBox draft={draft} setDraft={setDraft}
+                fields={[["항목명", "label"], ["값", "value"]]}
+                onSave={handleSave} onClose={close} accent={accent} theme={theme}
+                formFile={formFile} setFormFile={setFormFile} />
+            )}
+          </div>
         ))
       }
     </div>

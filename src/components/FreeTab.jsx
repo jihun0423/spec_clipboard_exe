@@ -11,22 +11,23 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
   const [draft, setDraft] = useState(EMPTY);
   const [uploading, setUploading] = useState({});
   const [formFile, setFormFile] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
-  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); };
-  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); };
-  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); };
+  const openAdd = () => { setDraft(EMPTY); setForm("add"); setFormFile(null); setEditingId(null); };
+  const openEdit = (item) => { setDraft(item); setForm(item.id); setFormFile(null); setEditingId(item.id); };
+  const close = () => { setForm(null); setDraft(EMPTY); setFormFile(null); setEditingId(null); };
 
-    const handleSave = async () => {
+  const handleSave = async () => {
     if (!draft.title) return;
     if (form === "add") {
-        const newId = await onAdd(draft);
-        if (formFile && newId) await uploadFile({ id: newId, ...draft }, formFile);
+      const newId = await onAdd(draft);
+      if (formFile && newId) await uploadFile({ id: newId, ...draft }, formFile);
     } else {
-        await onUpdate(form, draft);
-        if (formFile) await uploadFile({ id: form, ...draft }, formFile);
+      await onUpdate(form, draft);
+      if (formFile) await uploadFile({ id: form, ...draft }, formFile);
     }
     close();
-    };
+  };
 
   const uploadFile = async (item, file) => {
     setUploading(prev => ({ ...prev, [item.id]: true }));
@@ -56,7 +57,7 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
         fontWeight: 600, cursor: "pointer", marginBottom: "8px",
       }}>+ 항목 추가</button>
 
-      {form && (
+      {form === "add" && (
         <FormBox draft={draft} setDraft={setDraft}
           fields={[["제목", "title"], ["내용", "content"]]}
           onSave={handleSave} onClose={close} accent={accent} theme={theme}
@@ -65,24 +66,33 @@ export default function FreeTab({ data, loading, accent, onAdd, onUpdate, onDele
 
       {loading ? <p style={{ color: theme?.textMut || "#7a80a0", fontSize: "12px" }}>로딩 중...</p> :
         data.map((item) => (
-          <CardItem key={item.id}
-            title={item.title}
-            subtitle={item.content?.slice(0, 40) + (item.content?.length > 40 ? "..." : "")}
-            accent={accent} theme={theme}
-            fields={[
-              { label: "제목", value: item.title },
-              { label: "내용", value: item.content },
-            ]}
-            allCopyText={`${item.title}\n${item.content}`}
-            onEdit={() => openEdit(item)}
-            onDelete={() => onDelete(item.id)}
-            footer={
-              <FileSection item={item} uploading={uploading[item.id]}
-                onUpload={(file) => uploadFile(item, file)}
-                onDelete={() => handleFileDelete(item)}
-                accent={accent} theme={theme} />
-            }
-          />
+          <div key={item.id}>
+            <CardItem
+              title={item.title}
+              subtitle={item.content?.slice(0, 40) + (item.content?.length > 40 ? "..." : "")}
+              accent={accent} theme={theme}
+              fields={[
+                { label: "제목", value: item.title },
+                { label: "내용", value: item.content },
+                ...(item.customFields || []).map(f => ({ label: f.label, value: f.value })),
+              ]}
+              allCopyText={`${item.title}\n${item.content}`}
+              onEdit={() => openEdit(item)}
+              onDelete={() => onDelete(item.id)}
+              footer={
+                <FileSection item={item} uploading={uploading[item.id]}
+                  onUpload={(file) => uploadFile(item, file)}
+                  onDelete={() => handleFileDelete(item)}
+                  accent={accent} theme={theme} />
+              }
+            />
+            {editingId === item.id && (
+              <FormBox draft={draft} setDraft={setDraft}
+                fields={[["제목", "title"], ["내용", "content"]]}
+                onSave={handleSave} onClose={close} accent={accent} theme={theme}
+                formFile={formFile} setFormFile={setFormFile} />
+            )}
+          </div>
         ))
       }
     </div>

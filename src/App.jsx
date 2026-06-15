@@ -10,6 +10,7 @@ import ProjectTab from "./components/ProjectTab";
 import CourseTab from "./components/CourseTab";
 import FreeTab from "./components/FreeTab";
 import SettingTab from "./components/SettingTab";
+import AutoFillTab from "./components/AutoFillTab";
 import { useFirestore } from "./hooks/useFirestore";
 import { darkTheme, lightTheme } from "./theme";
 
@@ -21,6 +22,7 @@ const TABS = [
   { key: "projects",   label: "프로젝트",  color: "#a78bfa" },
   { key: "coursework", label: "교육사항",  color: "#22d3ee" },
   { key: "free",       label: "자유",      color: "#fb923c" },
+  { key: "autofill",   label: "🤖 AI",     color: "#ec4899" },
 ];
 
 export default function App() {
@@ -164,7 +166,10 @@ export default function App() {
           </div>
 
           <div style={{ flex: 1, overflowY: "auto", padding: "8px" }}>
-            <TabComponent {...tabProps} />
+            {currentTab === 7
+              ? <AutoFillTab data={data} theme={theme} />
+              : <TabComponent {...tabProps} />
+            }
           </div>
         </>
       )}
@@ -175,33 +180,25 @@ export default function App() {
         padding: "6px 12px", display: "flex", alignItems: "center",
         justifyContent: "space-between", flexShrink: 0,
       }}>
-        {/* 왼쪽: 라이트/다크 모드 */}
         <div style={{ display: "flex", gap: "4px" }}>
           <button onClick={() => setIsDark(false)} style={{
             background: !isDark ? "#f59e0b" : theme.surface2,
             color: !isDark ? "#fff" : theme.textMut,
             border: "none", borderRadius: "6px",
-            padding: "3px 8px", fontSize: "13px",
-            cursor: "pointer",
+            padding: "3px 8px", fontSize: "13px", cursor: "pointer",
           }}>☀️</button>
           <button onClick={() => setIsDark(true)} style={{
             background: isDark ? "#5b6cff" : theme.surface2,
             color: isDark ? "#fff" : theme.textMut,
             border: "none", borderRadius: "6px",
-            padding: "3px 8px", fontSize: "13px",
-            cursor: "pointer",
+            padding: "3px 8px", fontSize: "13px", cursor: "pointer",
           }}>🌙</button>
         </div>
 
-        {/* 오른쪽: 투명도 슬라이더 */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span style={{ fontSize: "11px", color: theme.textMut }}>투명도</span>
           <input
-            type="range"
-            min="0.3"
-            max="1"
-            step="0.05"
-            value={opacity}
+            type="range" min="0.3" max="1" step="0.05" value={opacity}
             onChange={(e) => handleOpacity(parseFloat(e.target.value))}
             style={{ width: "80px", cursor: "pointer", accentColor: "#5b6cff" }}
           />

@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   installUpdate: () => ipcRenderer.send("install-update"),
   onUpdateStatus: (callback) => ipcRenderer.on("update-status", (e, status, info) => callback(status, info)),
   onUpdateProgress: (callback) => ipcRenderer.on("update-progress", (e, percent) => callback(percent)),
+  autoFill: (data) => ipcRenderer.invoke("auto-fill", data),
 });
