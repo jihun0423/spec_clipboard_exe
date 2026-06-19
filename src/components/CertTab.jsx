@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../firebase";
 import CardItem from "./CardItem";
+import FileSection from "./FileSection";
 
 const EMPTY = { name: "", number: "", date: "", issuer: "" };
 
@@ -99,50 +100,7 @@ export default function CertTab({ data, loading, accent, onAdd, onUpdate, onDele
   );
 }
 
-function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
-  const border = theme?.border || "#2e3350";
-  const textMut = theme?.textMut || "#7a80a0";
-
-  const handleDownload = () => {
-    if (window.electronAPI) window.electronAPI.downloadFile(item.fileUrl, item.fileName);
-    else window.open(item.fileUrl, "_blank");
-  };
-
-  return (
-    <div style={{ borderTop: `1px solid ${border}`, padding: "8px 10px",
-      display: "flex", alignItems: "center", gap: "8px" }}>
-      <span style={{ fontSize: "11px", color: textMut, flexShrink: 0 }}>📎 파일</span>
-      {item.fileUrl ? (
-        <>
-          <button onClick={handleDownload} style={{
-            fontSize: "11px", color: accent, flex: 1, background: "transparent",
-            border: "none", textAlign: "left", cursor: "pointer", padding: 0,
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-          }}>⬇ {item.fileName}</button>
-          <button onClick={onDelete} style={{
-            background: "#f87171", color: "#fff", border: "none",
-            borderRadius: "5px", padding: "3px 8px", fontSize: "11px",
-            fontWeight: 600, cursor: "pointer", flexShrink: 0,
-          }}>삭제</button>
-        </>
-      ) : (
-        <label style={{
-          background: uploading ? (theme?.surface2 || "#22263a") : accent,
-          color: "#fff", borderRadius: "5px", padding: "3px 10px",
-          fontSize: "11px", fontWeight: 600, cursor: "pointer", flexShrink: 0,
-        }}>
-          {uploading ? "업로드 중..." : "📤 업로드"}
-          <input type="file" accept=".pdf,.jpg,.jpeg,.png"
-            style={{ display: "none" }}
-            onChange={(e) => onUpload(e.target.files[0])}
-            disabled={uploading} />
-        </label>
-      )}
-    </div>
-  );
-}
-
-export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, theme, formFile, setFormFile, selectFields }) {
+export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, theme, formFile, setFormFile, selectFields, textAreaField }) {
   const surface = theme?.surface || "#1a1d27";
   const surface2 = theme?.surface2 || "#22263a";
   const border = theme?.border || "#2e3350";
@@ -168,6 +126,7 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
     <div style={{ background: surface, border: `1px solid ${accent}`,
       borderRadius: "10px", padding: "12px", marginBottom: "8px" }}>
 
+      {/* 기본 필드 */}
       {fields.map(([label, key]) => (
         <div key={key} style={{ display: "flex", alignItems: "center",
           gap: "8px", marginBottom: "6px" }}>
@@ -179,6 +138,32 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
         </div>
       ))}
 
+      {/* 텍스트 에어리어 필드 (자소서 내용 등 긴 내용용) */}
+      {textAreaField && (
+        <div style={{ marginBottom: "6px" }}>
+          <span style={{ fontSize: "11px", color: textMut, display: "block", marginBottom: "4px" }}>
+            {textAreaField.label}
+          </span>
+          <textarea
+            value={draft[textAreaField.key] || ""}
+            onChange={(e) => setDraft({ ...draft, [textAreaField.key]: e.target.value })}
+            placeholder="내용을 입력하세요..."
+            style={{
+              width: "100%", minHeight: "160px",
+              background: surface2, border: `1px solid ${border}`,
+              borderRadius: "6px", padding: "8px",
+              fontSize: "12px", color: text,
+              outline: "none", resize: "vertical",
+              lineHeight: 1.7, boxSizing: "border-box",
+            }}
+          />
+          <div style={{ textAlign: "right", fontSize: "10px", color: textMut, marginTop: "2px" }}>
+            {(draft[textAreaField.key] || "").length}자
+          </div>
+        </div>
+      )}
+
+      {/* 선택 필드 */}
       {selectFields && selectFields.map(({ label, key, options }) => (
         <div key={key} style={{ display: "flex", alignItems: "center",
           gap: "8px", marginBottom: "6px" }}>
@@ -196,6 +181,7 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
         </div>
       ))}
 
+      {/* 커스텀 필드 */}
       {customFields.map((f, idx) => (
         <div key={idx} style={{ display: "flex", alignItems: "center",
           gap: "6px", marginBottom: "6px" }}>
@@ -224,6 +210,7 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
         fontWeight: 600, cursor: "pointer", marginBottom: "8px",
       }}>+ 항목 추가</button>
 
+      {/* 파일 업로드 */}
       {setFormFile && (
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
           <span style={{ fontSize: "11px", color: textMut, width: "52px", flexShrink: 0 }}>📎 파일</span>
@@ -254,6 +241,7 @@ export function FormBox({ draft, setDraft, fields, onSave, onClose, accent, them
         </div>
       )}
 
+      {/* 저장/취소 */}
       <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
         <button onClick={onSave} style={{
           flex: 1, background: accent, color: "#fff", border: "none",

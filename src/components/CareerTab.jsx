@@ -3,8 +3,9 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage
 import { storage } from "../firebase";
 import CardItem from "./CardItem";
 import { FormBox } from "./CertTab";
+import FileSection from "./FileSection";
 
-const EMPTY = { org: "", dept: "", position: "", type: "", period: "", desc: "" };
+const EMPTY = { org: "", dept: "", position: "", type: "", period: "", desc: "", retire_reason: "" };
 
 export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDelete, uid, theme }) {
   const [form, setForm] = useState(null);
@@ -49,6 +50,16 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
     } catch (e) { console.error(e); }
   };
 
+  const CAREER_FIELDS = [
+    ["기관명",     "org"],
+    ["부서",       "dept"],
+    ["직급",       "position"],
+    ["구분",       "type"],
+    ["기간",       "period"],
+    ["업무내용",   "desc"],
+    ["퇴직사유",   "retire_reason"],
+  ];
+
   return (
     <div>
       <button onClick={openAdd} style={{
@@ -59,14 +70,7 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
 
       {form === "add" && (
         <FormBox draft={draft} setDraft={setDraft}
-          fields={[
-            ["기관명",   "org"],
-            ["부서",     "dept"],
-            ["직급",     "position"],
-            ["구분",     "type"],
-            ["기간",     "period"],
-            ["업무내용", "desc"],
-          ]}
+          fields={CAREER_FIELDS}
           onSave={handleSave} onClose={close} accent={accent} theme={theme}
           formFile={formFile} setFormFile={setFormFile} />
       )}
@@ -85,6 +89,7 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
                 { label: "구분",     value: item.type },
                 { label: "기간",     value: item.period },
                 { label: "업무내용", value: item.desc },
+                { label: "퇴직사유", value: item.retire_reason },
                 ...(item.customFields || []).map(f => ({ label: f.label, value: f.value })),
               ]}
               allCopyText={`${item.org}${item.dept ? " " + item.dept : ""}${item.position ? " " + item.position : ""} (${item.type}) ${item.period}\n${item.desc}`}
@@ -99,63 +104,13 @@ export default function CareerTab({ data, loading, accent, onAdd, onUpdate, onDe
             />
             {editingId === item.id && (
               <FormBox draft={draft} setDraft={setDraft}
-                fields={[
-                  ["기관명",   "org"],
-                  ["부서",     "dept"],
-                  ["직급",     "position"],
-                  ["구분",     "type"],
-                  ["기간",     "period"],
-                  ["업무내용", "desc"],
-                ]}
+                fields={CAREER_FIELDS}
                 onSave={handleSave} onClose={close} accent={accent} theme={theme}
                 formFile={formFile} setFormFile={setFormFile} />
             )}
           </div>
         ))
       }
-    </div>
-  );
-}
-
-function FileSection({ item, uploading, onUpload, onDelete, accent, theme }) {
-  const border = theme?.border || "#2e3350";
-  const textMut = theme?.textMut || "#7a80a0";
-
-  const handleDownload = () => {
-    if (window.electronAPI) window.electronAPI.downloadFile(item.fileUrl, item.fileName);
-    else window.open(item.fileUrl, "_blank");
-  };
-
-  return (
-    <div style={{ borderTop: `1px solid ${border}`, padding: "8px 10px",
-      display: "flex", alignItems: "center", gap: "8px" }}>
-      <span style={{ fontSize: "11px", color: textMut, flexShrink: 0 }}>📎 파일</span>
-      {item.fileUrl ? (
-        <>
-          <button onClick={handleDownload} style={{
-            fontSize: "11px", color: accent, flex: 1, background: "transparent",
-            border: "none", textAlign: "left", cursor: "pointer", padding: 0,
-            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-          }}>⬇ {item.fileName}</button>
-          <button onClick={onDelete} style={{
-            background: "#f87171", color: "#fff", border: "none",
-            borderRadius: "5px", padding: "3px 8px", fontSize: "11px",
-            fontWeight: 600, cursor: "pointer", flexShrink: 0,
-          }}>삭제</button>
-        </>
-      ) : (
-        <label style={{
-          background: uploading ? (theme?.surface2 || "#22263a") : accent,
-          color: "#fff", borderRadius: "5px", padding: "3px 10px",
-          fontSize: "11px", fontWeight: 600, cursor: "pointer", flexShrink: 0,
-        }}>
-          {uploading ? "업로드 중..." : "📤 업로드"}
-          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.zip,.docx,.xlsx"
-            style={{ display: "none" }}
-            onChange={(e) => onUpload(e.target.files[0])}
-            disabled={uploading} />
-        </label>
-      )}
     </div>
   );
 }

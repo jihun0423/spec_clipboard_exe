@@ -10,6 +10,7 @@ const { exec } = require("child_process");
 
 const isDev = process.env.NODE_ENV === "development";
 let win;
+let previewWin = null;
 
 const sizes = [
   [380, 500],
@@ -142,6 +143,128 @@ ipcMain.on("install-update", () => {
   autoUpdater.quitAndInstall();
 });
 
+// ── 파일 미리보기 창 ──
+ipcMain.on("preview-file", (event, { url, fileName }) => {
+  const ext = (fileName.split(".").pop() || "").toLowerCase();
+  const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(ext);
+  const isPdf = ext === "pdf";
+
+  if (!isImage && !isPdf) {
+    shell.openExternal(url);
+    return;
+  }
+
+  if (previewWin && !previewWin.isDestroyed()) {
+    previewWin.close();
+  }
+
+  previewWin = new BrowserWindow({
+    width: 520,
+    height: 700,
+    alwaysOnTop: true,
+    title: fileName,
+    autoHideMenuBar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: path.join(__dirname, "preload.js"),
+      webSecurity: false,
+    },
+  });
+
+  // Firebase URL을 fetch해서 로컬 임시파일로 저장 후 로드
+  const tmpFile = path.join(app.getPath("temp"), "specclip_preview_" + fileName);
+
+  const fetchUrl = (urlStr) => new Promise((resolve, reject) => {
+    const req = https.get(urlStr, (res) => {
+      if (res.statusCode === 301 || res.statusCode === 302) {
+        fetchUrl(res.headers.location).then(resolve).catch(reject);
+        return;
+      }
+      const chunks = [];
+      res.on("data", chunk => chunks.push(chunk));
+      res.on("end", () => resolve(Buffer.concat(chunks)));
+      res.on("error", reject);
+    });
+    req.on("error", reject);
+  });
+
+  fetchUrl(url).then(buffer => {
+    console.log("fetch 성공, 크기:", buffer.length, "tmpFile:", tmpFile);
+    fs.writeFileSync(tmpFile, buffer);
+
+    const toolbar = `
+      <div style="background:#22263a;padding:8px 12px;display:flex;
+        align-items:center;justify-content:space-between;
+        border-bottom:1px solid #2e3350;flex-shrink:0;">
+        <span style="color:#e8eaf0;font-size:12px;font-family:sans-serif;
+          overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">
+          ${fileName}
+        </span>
+        <button id="pinBtn" onclick="togglePin()" style="background:#ec4899;
+          color:#fff;border:none;border-radius:6px;padding:4px 10px;
+          font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;margin-left:8px;">
+          📌 고정 ON
+        </button>
+      </div>
+    `;
+
+    const script = `
+      <script>
+        let pinned = true;
+        function togglePin() {
+          pinned = !pinned;
+          const btn = document.getElementById('pinBtn');
+          btn.textContent = pinned ? '📌 고정 ON' : '📌 고정 OFF';
+          btn.style.background = pinned ? '#ec4899' : '#2e3350';
+          btn.style.color = pinned ? '#fff' : '#7a80a0';
+          window.electronAPI?.previewTogglePin(pinned);
+        }
+      <\/script>
+    `;
+
+    let html;
+    if (isImage) {
+      const base64 = buffer.toString("base64");
+      const mimeType = ext === "png" ? "image/png" :
+                       ext === "gif" ? "image/gif" :
+                       ext === "webp" ? "image/webp" : "image/jpeg";
+      html = `<!DOCTYPE html><html><head><style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{background:#1a1d27;display:flex;flex-direction:column;height:100vh;}
+        .content{flex:1;overflow:auto;display:flex;align-items:center;
+          justify-content:center;padding:12px;}
+        img{max-width:100%;height:auto;border-radius:8px;}
+      </style></head><body>
+        ${toolbar}
+        <div class="content">
+          <img src="data:${mimeType};base64,${base64}" />
+        </div>
+        ${script}
+      </body></html>`;
+    } else {
+      // PDF는 직접 파일 경로로 로드
+      previewWin.loadURL(encodeURI("file:///" + tmpFile.replace(/\\/g, "/")));
+      return;
+    }
+
+    previewWin.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+  }).catch(err => {
+    console.error("미리보기 로드 실패 상세:", err.message, err.stack);
+  });
+
+  previewWin.on("closed", () => {
+    previewWin = null;
+    try { fs.unlinkSync(tmpFile); } catch (e) {}
+  });
+});
+
+ipcMain.on("preview-toggle-pin", (event, value) => {
+  if (previewWin && !previewWin.isDestroyed()) {
+    previewWin.setAlwaysOnTop(value);
+  }
+});
+
 // ── AI 자동입력 ──
 ipcMain.handle("auto-fill", async (event, data) => {
   try {
@@ -150,10 +273,9 @@ ipcMain.handle("auto-fill", async (event, data) => {
 
     console.log("API Key 확인:", apiKey ? "있음" : "없음");
 
-    // DPI 스케일 확인
     const primaryDisplay = screen.getPrimaryDisplay();
     const scaleFactor = primaryDisplay.scaleFactor;
-    const screenSize = primaryDisplay.size; // CSS 픽셀 기준
+    const screenSize = primaryDisplay.size;
     console.log("스케일팩터:", scaleFactor, "화면크기:", screenSize);
 
     win.setAlwaysOnTop(false);
@@ -181,12 +303,20 @@ ipcMain.handle("auto-fill", async (event, data) => {
 
     for (const field of claudeResult.fields) {
       try {
-        // 실제 물리 픽셀 기준 좌표 계산 (DPI 스케일 적용)
         const absX = Math.round(field.x * screenSize.width);
         const absY = Math.round(field.y * screenSize.height);
         console.log("입력 시도:", field.label, field.value, absX, absY, "(scale:", scaleFactor + ")");
 
-        // 임시 ps1 파일에 UTF-8 BOM으로 저장
+        const safeValue = field.value
+          .replace(/'/g, "''")
+          .replace(/\+/g, "{+}")
+          .replace(/\^/g, "{^}")
+          .replace(/~/g, "{~}")
+          .replace(/\(/g, "{(}")
+          .replace(/\)/g, "{)}")
+          .replace(/\[/g, "{[}")
+          .replace(/\]/g, "{]}");
+
         const psScript = [
           "Add-Type -AssemblyName System.Windows.Forms",
           "Add-Type -AssemblyName System.Drawing",
@@ -210,7 +340,6 @@ ipcMain.handle("auto-fill", async (event, data) => {
         ].join("\r\n");
 
         const tmpFile = path.join(app.getPath("temp"), "specclip_input.ps1");
-        // UTF-8 BOM으로 저장해야 한글/한자 처리 가능
         const bom = Buffer.from([0xEF, 0xBB, 0xBF]);
         const content = Buffer.from(psScript, "utf8");
         fs.writeFileSync(tmpFile, Buffer.concat([bom, content]));

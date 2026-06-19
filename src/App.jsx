@@ -15,7 +15,7 @@ import { useFirestore } from "./hooks/useFirestore";
 import { darkTheme, lightTheme } from "./theme";
 
 const TABS = [
-  { key: "certs",      label: "자격증",    color: "#5b6cff" },
+  { key: "certs",      label: "자격사항",    color: "#5b6cff" },
   { key: "basic",      label: "기본정보",  color: "#34d399" },
   { key: "education",  label: "학력",      color: "#f59e0b" },
   { key: "career",     label: "경력/봉사", color: "#f87171" },

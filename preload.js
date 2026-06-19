@@ -8,7 +8,9 @@ contextBridge.exposeInMainWorld("electronAPI", {
   setOpacity: (value) => ipcRenderer.send("set-opacity", value),
   checkForUpdate: () => ipcRenderer.send("check-for-update"),
   installUpdate: () => ipcRenderer.send("install-update"),
-  onUpdateStatus: (callback) => ipcRenderer.on("update-status", (e, status, info) => callback(status, info)),
-  onUpdateProgress: (callback) => ipcRenderer.on("update-progress", (e, percent) => callback(percent)),
+  onUpdateStatus: (cb) => ipcRenderer.on("update-status", (_, ...args) => cb(...args)),
+  onUpdateProgress: (cb) => ipcRenderer.on("update-progress", (_, val) => cb(val)),
   autoFill: (data) => ipcRenderer.invoke("auto-fill", data),
+  previewFile: (url, fileName) => ipcRenderer.send("preview-file", { url, fileName }),
+  previewTogglePin: (value) => ipcRenderer.send("preview-toggle-pin", value),
 });
